@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "Chrome Extension v3 Starter",
-  "description": "A minimal example of a chrome extension using manifest v3",
+  "name": "Clickbait Detect",
+  "description": "Clickbait Detect is a Chrome extension that detects potential 'clickbait videos on YouTube.",
   "version": "0.0.1",
   "icons": {
     "16": "logo/logo-16.png",
@@ -10,7 +10,7 @@
   },
   "options_page": "settings/settings.html",
   "action": {
-    "default_title": "Chrome Addon v3 Starter",
+    "default_title": "Clickbait Detect",
     "default_popup": "popup/popup.html"
   },
   "permissions": [],

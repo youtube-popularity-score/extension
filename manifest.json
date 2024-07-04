@@ -11,17 +11,22 @@
   "options_page": "settings/settings.html",
   "action": {
     "default_title": "Clickbait Detect",
-    "default_popup": "popup/popup.html"
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "logo/logo-16.png",
+      "48": "logo/logo-48.png",
+      "128": "logo/logo-128.png"
+    }
   },
-  "permissions": [],
+  "permissions": ["activeTab", "scripting"],
   "host_permissions": ["*://*/*"],
   "background": {
-    "service_worker": "service-worker.js"
+    "service_worker": "background.js"
   },
   "content_scripts": [
     {
-      "js": ["foreground.js"],
-      "matches": ["https://github.com/*"]
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
     }
   ]
 }

@@ -1,32 +1,20 @@
 {
   "manifest_version": 3,
-  "name": "Clickbait Detect",
-  "description": "Clickbait Detect is a Chrome extension that detects potential 'clickbait videos on YouTube.",
-  "version": "0.0.1",
-  "icons": {
-    "16": "logo/logo-16.png",
-    "48": "logo/logo-48.png",
-    "128": "logo/logo-128.png"
-  },
-  "options_page": "settings/settings.html",
-  "action": {
-    "default_title": "Clickbait Detect",
-    "default_popup": "popup/popup.html",
-    "default_icon": {
-      "16": "logo/logo-16.png",
-      "48": "logo/logo-48.png",
-      "128": "logo/logo-128.png"
-    }
-  },
+  "name": "YouTube Title Highlighter",
+  "version": "1.0",
   "permissions": ["activeTab", "scripting"],
-  "host_permissions": ["*://*/*"],
   "background": {
     "service_worker": "background.js"
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
+      "matches": ["*://www.youtube.com/*"],
       "js": ["content.js"]
     }
-  ]
+  ],
+  "icons": {
+    "16": "logo/logo-16.png",
+    "48": "logo/logo-48.png",
+    "128": "logo/logo-128.png"
+  }
 }

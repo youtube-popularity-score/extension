@@ -113,20 +113,13 @@ function calculateScore(title) {
   return score;
 }
 
-async function fetchVideoDetails(videoId) {
-  const url = `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=${apiKey}&part=snippet, statistics`;
-
-  try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch video details for video ID: ${videoId}`);
-    }
-    const data = await response.json();
-    return data.items[0]; // Return the first item (should be the only one)
-  } catch (error) {
-    console.error(error);
-    return null;
-  }
+async function fetchVideoDetails(videoIds) {
+  const url = `https://www.googleapis.com/youtube/v3/videos?id=${videoIds.join(
+    ","
+  )}&key=${apiKey}&part=snippet`;
+  const response = await fetch(url);
+  const data = await response.json();
+  return data.items;
 }
 
 function highlightTitles(videos) {
@@ -152,7 +145,7 @@ function highlightTitles(videos) {
 }
 
 function getVideoIds() {
-  const videoElements = document.querySelectorAll("a#video-title-link");
+  const videoElements = document.querySelectorAll("a#video-title");
   const videoIds = [];
   videoElements.forEach((element) => {
     const url = new URL(element.href);
@@ -166,30 +159,10 @@ function getVideoIds() {
 
 async function processVideos() {
   const videoIds = getVideoIds();
-  console.log("videoIds: ", videoIds);
-
   if (videoIds.length > 0) {
-    const videos = [];
-    for (const videoId of videoIds) {
-      const video = await fetchVideoDetails(videoId);
-      if (video) {
-        videos.push(video);
-      }
-    }
+    const videos = await fetchVideoDetails(videoIds);
     highlightTitles(videos);
   }
 }
 
-function observeYouTube() {
-  const observer = new MutationObserver(() => {
-    processVideos();
-  });
-
-  const config = { childList: true, subtree: true };
-  observer.observe(document.body, config);
-
-  // Initial processing
-  processVideos();
-}
-
-observeYouTube();
+processVideos();

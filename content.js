@@ -103,14 +103,18 @@ const VideoInfoScraper = (function () {
     { score: 4, word: "gizli aşklar" },
   ];
 
-  function calculateClickbaitScore(title) {
+  function calculateClickbaitScore(title, description) {
     let score = 0;
     let matchedKeywords = [];
     const lowerCaseTitle = title.toLowerCase();
+    const lowerCaseDescription = description.toLowerCase();
 
     keywords.forEach((keyword) => {
       const lowerCaseKeyword = keyword.word.toLowerCase();
-      if (lowerCaseTitle.includes(lowerCaseKeyword)) {
+      if (
+        lowerCaseTitle.includes(lowerCaseKeyword) ||
+        lowerCaseDescription.includes(lowerCaseKeyword)
+      ) {
         score += keyword.score;
         matchedKeywords.push(keyword.word);
       }
@@ -138,13 +142,24 @@ const VideoInfoScraper = (function () {
             "ytd-rich-item-renderer, ytd-video-renderer"
           );
 
-          const videoUrl = titleElement.href;
+          const videoUrl = titleElement.parentElement.href;
           const imageElement =
             videoContainer.querySelector("ytd-thumbnail img");
           const imageUrl = imageElement ? imageElement.src : "";
 
           const title = titleElement.textContent.trim();
-          const { score, matchedKeywords } = calculateClickbaitScore(title);
+
+          // Get description text
+          const descriptionElement =
+            videoContainer.querySelector("#description");
+          const description = descriptionElement
+            ? descriptionElement.textContent.trim()
+            : "";
+
+          const { score, matchedKeywords } = calculateClickbaitScore(
+            title,
+            description
+          );
           const result = getClickbaitResult(score);
 
           // Set the background color of the title element
@@ -159,6 +174,7 @@ const VideoInfoScraper = (function () {
             likelihood: result.likelihood,
             color: result.color,
             matchedKeywords: matchedKeywords,
+            description: description,
           };
         });
         return videoInfos;

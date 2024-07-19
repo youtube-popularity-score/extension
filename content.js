@@ -148,8 +148,6 @@ const VideoInfoScraper = (function () {
           const imageUrl = imageElement ? imageElement.src : "";
 
           const title = titleElement.textContent.trim();
-
-          // Get description text
           const descriptionElement =
             videoContainer.querySelector("#description");
           const description = descriptionElement
@@ -162,7 +160,6 @@ const VideoInfoScraper = (function () {
           );
           const result = getClickbaitResult(score);
 
-          // Set the background color of the title element
           titleElement.style.backgroundColor = result.color;
 
           return {

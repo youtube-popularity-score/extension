@@ -1,223 +1,88 @@
-const VideoInfoScraper = (function () {
-  let instance;
 
-  const keywords = [
-    { score: 5, word: "devasa" },
-    { score: 5, word: "muhteşem" },
-    { score: 5, word: "inanılmaz" },
-    { score: 5, word: "şok" },
-    { score: 4, word: "hayret verici" },
-    { score: 3, word: "en iyi" },
-    { score: 3, word: "kesinlikle" },
-    { score: 4, word: "asla" },
-    { score: 4, word: "mükemmel" },
-    { score: 5, word: "inanılmaz" },
-    { score: 5, word: "görmeniz lazım" },
-    { score: 5, word: "şok edici" },
-    { score: 5, word: "inanılmaz" },
-    { score: 5, word: "akıl almaz" },
-    { score: 4, word: "şaşırtıcı" },
-    { score: 5, word: "görünce şok olacaksınız" },
-    { score: 5, word: "gözlerinize inanamayacaksınız" },
-    { score: 4, word: "sizi çok şaşırtacak" },
-    { score: 5, word: "herkesi şok etti" },
-    { score: 4, word: "dikkat!" },
-    { score: 4, word: "uyarı!" },
-    { score: 5, word: "hemen" },
-    { score: 4, word: "acele edin" },
-    { score: 4, word: "sakın kaçırmayın" },
-    { score: 3, word: "kritik" },
-    { score: 4, word: "sır" },
-    { score: 4, word: "gizli" },
-    { score: 4, word: "bilinmeyen" },
-    { score: 3, word: "keşfedilmemiş" },
-    { score: 3, word: "bilinmeyen detaylar" },
-    { score: 4, word: "saklı kalan" },
-    { score: 4, word: "garanti" },
-    { score: 5, word: "kesin" },
-    { score: 4, word: "mutlaka" },
-    { score: 4, word: "kaçırmayın" },
-    { score: 4, word: "kaçırmamanız gereken" },
-    { score: 5, word: "garanti ediyoruz" },
-    { score: 4, word: "kaçırılmayacak" },
-    { score: 4, word: "ilginç" },
-    { score: 4, word: "enteresan" },
-    { score: 4, word: "hayatınızda hiç görmediğiniz" },
-    { score: 4, word: "olağanüstü" },
-    { score: 4, word: "benzersiz" },
-    { score: 3, word: "eşi benzeri olmayan" },
-    { score: 4, word: "daha önce hiç duymadığınız" },
-    { score: 4, word: "kalp kıran" },
-    { score: 4, word: "hüzünlü" },
-    { score: 3, word: "duygusal" },
-    { score: 4, word: "gözyaşlarına boğulacaksınız" },
-    { score: 3, word: "içinizi ısıtacak" },
-    { score: 4, word: "yürek burkan" },
-    { score: 3, word: "ağlatan" },
-    { score: 5, word: "en iyi" },
-    { score: 5, word: "en kötü" },
-    { score: 4, word: "en" },
-    { score: 5, word: "asla" },
-    { score: 4, word: "sonsuza dek" },
-    { score: 4, word: "bir daha asla" },
-    { score: 5, word: "hayatınızı değiştirecek" },
-    { score: 4, word: "nasıl?" },
-    { score: 4, word: "neden?" },
-    { score: 3, word: "kim?" },
-    { score: 3, word: "ne?" },
-    { score: 3, word: "hangi?" },
-    { score: 4, word: "bu neden oldu?" },
-    { score: 4, word: "bunu kim yaptı?" },
-    { score: 3, word: "hızlı" },
-    { score: 4, word: "anında" },
-    { score: 4, word: "kolayca" },
-    { score: 4, word: "hemen" },
-    { score: 3, word: "çabucak" },
-    { score: 3, word: "dakikalar içinde" },
-    { score: 3, word: "basit adımlarla" },
-    { score: 4, word: "inanılmaz değişim" },
-    { score: 4, word: "şaşırtıcı sonuçlar" },
-    { score: 4, word: "mucizevi" },
-    { score: 4, word: "devrim niteliğinde" },
-    { score: 3, word: "mükemmel cilt" },
-    { score: 3, word: "harika saçlar" },
-    { score: 4, word: "hayatınızı değiştirecek" },
-    { score: 4, word: "zengin olmanın yolları" },
-    { score: 4, word: "başarı sırları" },
-    { score: 4, word: "milyonlarca dolar kazanmak" },
-    { score: 4, word: "kısa sürede zengin olmak" },
-    { score: 3, word: "başarı hikayeleri" },
-    { score: 3, word: "para kazanma yöntemleri" },
-    { score: 3, word: "en eğlenceli" },
-    { score: 3, word: "komik" },
-    { score: 4, word: "güldüren" },
-    { score: 4, word: "kahkaha garantili" },
-    { score: 3, word: "çılgınca" },
-    { score: 3, word: "oyun değiştiren" },
-    { score: 4, word: "eğlenceli vakit geçirmek" },
-    { score: 4, word: "ünlülerin sırları" },
-    { score: 4, word: "magazin dünyasında" },
-    { score: 3, word: "ünlüler hakkında bilinmeyenler" },
-    { score: 4, word: "şok eden magazin haberleri" },
-    { score: 3, word: "ünlülerin hayatları" },
-    { score: 4, word: "gizli aşklar" },
-  ];
 
-  function calculateClickbaitScore(title, description) {
-    let score = 0;
-    let matchedKeywords = [];
-    const lowerCaseTitle = title.toLowerCase();
-    const lowerCaseDescription = description.toLowerCase();
+// // Helper function to calculate days between two dates
+// function calculateDaysBetween(d1, d2) {
+//   const oneDay = 24 * 60 * 60 * 1000;
+//   return Math.round(Math.abs((d2 - d1) / oneDay));
+// }
 
-    keywords.forEach((keyword) => {
-      const lowerCaseKeyword = keyword.word.toLowerCase();
-      if (
-        lowerCaseTitle.includes(lowerCaseKeyword) ||
-        lowerCaseDescription.includes(lowerCaseKeyword)
-      ) {
-        score += keyword.score;
-        matchedKeywords.push(keyword.word);
-      }
-    });
+// // Helper function to calculate view rate score
+// function calculateViewRateScore(viewCount, days) {
+//   const dailyViews = viewCount / days;
+//   if (dailyViews <= 100) return 1;
+//   else if (dailyViews <= 500) return 2;
+//   else if (dailyViews <= 1000) return 3;
+//   else if (dailyViews <= 5000) return 4;
+//   else if (dailyViews <= 10000) return 5;
+//   else if (dailyViews <= 50000) return 6;
+//   else if (dailyViews <= 100000) return 7;
+//   else if (dailyViews <= 500000) return 8;
+//   else if (dailyViews <= 1000000) return 9;
+//   else return 10;
+// }
 
-    return { score, matchedKeywords };
-  }
+// // Function to extract video data and add view rate score
+// function addViewRateScores() {
+//   const videoElements = document.querySelectorAll('ytd-rich-item-renderer');
 
-  function getClickbaitResult(score) {
-    if (score >= 9) {
-      return { likelihood: "yüksek", color: "red" };
-    } else if (score >= 6) {
-      return { likelihood: "orta", color: "orange" };
-    } else {
-      return { likelihood: "düşük", color: "green" };
-    }
-  }
+//   videoElements.forEach(videoElement => {
+//     if (videoElement.querySelector('.view-rate-score')) return;
 
-  function createInstance() {
-    return {
-      getVideoInfos: function () {
-        const videoElements = document.querySelectorAll("#video-title");
-        const videoInfos = Array.from(videoElements).map((titleElement) => {
-          const videoContainer = titleElement.closest(
-            "ytd-rich-item-renderer, ytd-video-renderer"
-          );
+//     const titleElement = videoElement.querySelector('#video-title');
+//     const metadataElement = videoElement.querySelector('#metadata-line');
+//     if (!titleElement || !metadataElement) return;
 
-          const videoUrl = titleElement.parentElement.href;
-          const imageElement =
-            videoContainer.querySelector("ytd-thumbnail img");
-          const imageUrl = imageElement ? imageElement.src : "";
+//     const uploadDateTextElement = metadataElement.querySelector('span:nth-child(2)');
+//     const viewCountTextElement = metadataElement.querySelector('span:nth-child(1)');
 
-          const title = titleElement.textContent.trim();
-          const descriptionElement =
-            videoContainer.querySelector("#description");
-          const description = descriptionElement
-            ? descriptionElement.textContent.trim()
-            : "";
+//     if (!uploadDateTextElement || !viewCountTextElement) return;
 
-          const { score, matchedKeywords } = calculateClickbaitScore(
-            title,
-            description
-          );
-          const result = getClickbaitResult(score);
+//     const uploadDateText = uploadDateTextElement.innerText;
+//     const viewCountText = viewCountTextElement.innerText;
 
-          titleElement.style.backgroundColor = result.color;
+//     // Parse view count
+//     const viewCount = parseInt(viewCountText.replace(/[^0-9]/g, ''), 10);
+//     if (isNaN(viewCount)) return;
 
-          return {
-            title: title,
-            url: videoUrl,
-            image: imageUrl,
-            titleElement: titleElement,
-            score: score,
-            likelihood: result.likelihood,
-            color: result.color,
-            matchedKeywords: matchedKeywords,
-            description: description,
-          };
-        });
-        return videoInfos;
-      },
-    };
-  }
+//     // Parse upload date
+//     const uploadDateMatch = uploadDateText.match(/(\d+)\s+(day|week|month|year)s?\s+ago/);
+//     if (!uploadDateMatch) return;
 
-  return {
-    getInstance: function () {
-      if (!instance) {
-        instance = createInstance();
-      }
-      return instance;
-    },
-  };
-})();
+//     const number = parseInt(uploadDateMatch[1], 10);
+//     const unit = uploadDateMatch[2];
 
-// Usage
+//     let days = 0;
+//     if (unit === 'day') days = number;
+//     else if (unit === 'week') days = number * 7;
+//     else if (unit === 'month') days = number * 30;
+//     else if (unit === 'year') days = number * 365;
 
-function observeYouTube() {
-  let previousTitles = new Set();
+//     const viewRateScore = calculateViewRateScore(viewCount, days);
 
-  const observer = new MutationObserver(() => {
-    const scraper = VideoInfoScraper.getInstance();
-    const videoInfos = scraper.getVideoInfos();
+//     const scoreElement = document.createElement('div');
+//     scoreElement.innerText = `View Rate Score: ${viewRateScore}/10`;
+//     scoreElement.className = 'view-rate-score';
+//     titleElement.parentElement.appendChild(scoreElement);
+//   });
+// }
 
-    // Filter new titles
-    const newInfos = videoInfos.filter(
-      (info) => !previousTitles.has(info.title)
-    );
+// // Function to observe changes in the YouTube homepage
+// function observeYouTube() {
+//   const observer = new MutationObserver(addViewRateScores);
+//   observer.observe(document.body, { childList: true, subtree: true });
+// }
 
-    if (newInfos.length > 0) {
-      console.log(newInfos);
-      newInfos.forEach((info) => previousTitles.add(info.title));
-    }
-  });
+// // Add styles for the score element
+// const styleElement = document.createElement('style');
+// styleElement.innerHTML = `
+//   .view-rate-score {
+//     font-size: 14px;
+//     font-weight: bold;
+//     color: red;
+//     margin-top: 4px;
+//   }
+// `;
+// document.head.appendChild(styleElement);
 
-  const config = { childList: true, subtree: true };
-  observer.observe(document.body, config);
-
-  // Initial fetch of video infos
-  const scraper = VideoInfoScraper.getInstance();
-  const videoInfos = scraper.getVideoInfos();
-
-  console.log(videoInfos);
-  videoInfos.forEach((info) => previousTitles.add(info.title));
-}
-
-observeYouTube();
+// // Run the observer function
+// observeYouTube();

@@ -1,5 +1,3 @@
-
-
 // // Helper function to calculate days between two dates
 // function calculateDaysBetween(d1, d2) {
 //   const oneDay = 24 * 60 * 60 * 1000;
@@ -86,3 +84,17 @@
 
 // // Run the observer function
 // observeYouTube();
+
+const popularVideoDetect = {
+  init: () => {
+    const videoElements = document.querySelectorAll("ytd-rich-item-renderer");
+
+    console.log("videoElements: ", videoElements);
+  },
+  ready: () => {
+    const observer = new MutationObserver(popularVideoDetect.init);
+    observer.observe(document.body, { childList: true, subtree: true });
+  },
+};
+
+popularVideoDetect.ready();

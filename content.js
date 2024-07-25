@@ -89,7 +89,7 @@ const popularVideoDetect = {
   init: () => {
     const videoElements = document.querySelectorAll("ytd-rich-item-renderer");
 
-    console.log("videoElements: ", videoElements);
+    videoElements.forEach((videoElement) => {});
   },
   ready: () => {
     const observer = new MutationObserver(popularVideoDetect.init);

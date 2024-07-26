@@ -1,98 +1,186 @@
-// // Helper function to calculate days between two dates
-// function calculateDaysBetween(d1, d2) {
-//   const oneDay = 24 * 60 * 60 * 1000;
-//   return Math.round(Math.abs((d2 - d1) / oneDay));
-// }
-
-// // Helper function to calculate view rate score
-// function calculateViewRateScore(viewCount, days) {
-//   const dailyViews = viewCount / days;
-//   if (dailyViews <= 100) return 1;
-//   else if (dailyViews <= 500) return 2;
-//   else if (dailyViews <= 1000) return 3;
-//   else if (dailyViews <= 5000) return 4;
-//   else if (dailyViews <= 10000) return 5;
-//   else if (dailyViews <= 50000) return 6;
-//   else if (dailyViews <= 100000) return 7;
-//   else if (dailyViews <= 500000) return 8;
-//   else if (dailyViews <= 1000000) return 9;
-//   else return 10;
-// }
-
-// // Function to extract video data and add view rate score
-// function addViewRateScores() {
-//   const videoElements = document.querySelectorAll('ytd-rich-item-renderer');
-
-//   videoElements.forEach(videoElement => {
-//     if (videoElement.querySelector('.view-rate-score')) return;
-
-//     const titleElement = videoElement.querySelector('#video-title');
-//     const metadataElement = videoElement.querySelector('#metadata-line');
-//     if (!titleElement || !metadataElement) return;
-
-//     const uploadDateTextElement = metadataElement.querySelector('span:nth-child(2)');
-//     const viewCountTextElement = metadataElement.querySelector('span:nth-child(1)');
-
-//     if (!uploadDateTextElement || !viewCountTextElement) return;
-
-//     const uploadDateText = uploadDateTextElement.innerText;
-//     const viewCountText = viewCountTextElement.innerText;
-
-//     // Parse view count
-//     const viewCount = parseInt(viewCountText.replace(/[^0-9]/g, ''), 10);
-//     if (isNaN(viewCount)) return;
-
-//     // Parse upload date
-//     const uploadDateMatch = uploadDateText.match(/(\d+)\s+(day|week|month|year)s?\s+ago/);
-//     if (!uploadDateMatch) return;
-
-//     const number = parseInt(uploadDateMatch[1], 10);
-//     const unit = uploadDateMatch[2];
-
-//     let days = 0;
-//     if (unit === 'day') days = number;
-//     else if (unit === 'week') days = number * 7;
-//     else if (unit === 'month') days = number * 30;
-//     else if (unit === 'year') days = number * 365;
-
-//     const viewRateScore = calculateViewRateScore(viewCount, days);
-
-//     const scoreElement = document.createElement('div');
-//     scoreElement.innerText = `View Rate Score: ${viewRateScore}/10`;
-//     scoreElement.className = 'view-rate-score';
-//     titleElement.parentElement.appendChild(scoreElement);
-//   });
-// }
-
-// // Function to observe changes in the YouTube homepage
-// function observeYouTube() {
-//   const observer = new MutationObserver(addViewRateScores);
-//   observer.observe(document.body, { childList: true, subtree: true });
-// }
-
-// // Add styles for the score element
-// const styleElement = document.createElement('style');
-// styleElement.innerHTML = `
-//   .view-rate-score {
-//     font-size: 14px;
-//     font-weight: bold;
-//     color: red;
-//     margin-top: 4px;
-//   }
-// `;
-// document.head.appendChild(styleElement);
-
-// // Run the observer function
-// observeYouTube();
-
 const popularVideoDetect = {
+  tools: {
+    convertViewCount: (viewStr) => {
+      const viewStrCleaned = viewStr.replace(/\u00A0/g, " ");
+      const parts = viewStrCleaned.split(" ");
+
+      const numberPart = parts[0].replace(/,/g, ".");
+      const suffix = parts[1];
+
+      let numericValue;
+      if (suffix === "Mn") {
+        numericValue = parseFloat(numberPart) * 1_000_000;
+      } else if (suffix === "B") {
+        numericValue = parseFloat(numberPart) * 1_000;
+      } else {
+        numericValue = parseFloat(numberPart);
+      }
+
+      return numericValue;
+    },
+    convertUploadDate: (dateStr) => {
+      const now = new Date();
+      let number, unit;
+
+      const match = dateStr.match(/(\d+)\s+(dakika|saat|gün|hafta|ay|yıl)/);
+      if (match) {
+        number = parseInt(match[1], 10);
+        unit = match[2];
+      } else {
+        return null;
+      }
+
+      let pastDate = new Date(now);
+      switch (unit) {
+        case "dakika":
+          pastDate.setMinutes(now.getMinutes() - number);
+          break;
+        case "saat":
+          pastDate.setHours(now.getHours() - number);
+          break;
+        case "gün":
+          pastDate.setDate(now.getDate() - number);
+          break;
+        case "hafta":
+          pastDate.setDate(now.getDate() - number * 7);
+          break;
+        case "ay":
+          pastDate.setMonth(now.getMonth() - number);
+          break;
+        case "yıl":
+          pastDate.setFullYear(now.getFullYear() - number);
+          break;
+      }
+
+      const diffTime = Math.abs(now - pastDate);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      return {
+        date: pastDate,
+        daysAgo: diffDays,
+      };
+    },
+    calculatePopularityScore: (uploadDate, viewCount) => {
+      const now = new Date();
+      const uploadDateObject = new Date(uploadDate);
+
+      const diffTime = Math.abs(now - uploadDateObject);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      const viewsPerDay = viewCount / diffDays;
+
+      const maxViewsPerDay = 1_000_000;
+      const score = Math.min((viewsPerDay / maxViewsPerDay) * 10, 10);
+
+      return Math.floor(score);
+    },
+    isNotEmptyElement: (videoElement) => {
+      const isReels = videoElement.getAttribute("is-slim-media") !== null;
+      const meta = videoElement.querySelector("#metadata-line");
+
+      const viewCount = meta.querySelector("span:nth-of-type(1)");
+      const viewCountText = viewCount?.innerText;
+
+      const uploadDate = meta.querySelector("span:nth-of-type(2)");
+      const uploadDateText = uploadDate?.innerText;
+
+      return (
+        !isReels &&
+        meta &&
+        viewCount &&
+        viewCountText &&
+        viewCountText !== "" &&
+        uploadDate &&
+        uploadDateText &&
+        uploadDateText !== ""
+      );
+    },
+    getScoreElement: (score) => {
+      const scoreView = document.createElement("span");
+      scoreView.textContent = `Score: ${score}`;
+      scoreView.classList.add("score-view");
+      scoreView.style.width = "100%";
+
+      return scoreView;
+    },
+    isYoutubeHomePage: () => {
+      const url = window.location.href;
+      return (
+        url === "https://www.youtube.com/" ||
+        url.startsWith("https://www.youtube.com/?")
+      );
+    },
+  },
+  getVideoInfo: (videoElement) => {
+    const meta = videoElement.querySelector("#metadata-line");
+
+    const viewCount = meta.querySelector("span:nth-of-type(1)");
+    const viewCountText = viewCount.innerText;
+
+    const uploadDate = meta.querySelector("span:nth-of-type(2)");
+    const uploadDateText = uploadDate.innerText;
+
+    return {
+      viewCount: popularVideoDetect.tools.convertViewCount(viewCountText),
+      viewCountText: viewCountText,
+      uploadDate: popularVideoDetect.tools.convertUploadDate(uploadDateText),
+      uploadDateText: uploadDateText,
+      meta: meta,
+    };
+  },
   init: () => {
+    if (!popularVideoDetect.tools.isYoutubeHomePage()) return;
+    console.log("init!");
+
     const videoElements = document.querySelectorAll("ytd-rich-item-renderer");
 
-    videoElements.forEach((videoElement) => {});
+    videoElements.forEach((videoElement) => {
+      // Video öğesinin daha önce işlendiğini kontrol edin
+      if (videoElement.getAttribute('data-processed')) return;
+
+      const hasElement = popularVideoDetect.tools.isNotEmptyElement(videoElement);
+
+      if (hasElement) {
+        const info = popularVideoDetect.getVideoInfo(videoElement);
+
+        if (!info.uploadDate?.date) {
+          console.log("info: ", info);
+        }
+
+        const popularityScore = popularVideoDetect.tools.calculatePopularityScore(
+          info.uploadDate.date,
+          info.viewCount
+        );
+
+        if (info.meta.querySelector(".score-view")) {
+          info.meta.removeChild(info.meta.querySelector(".score-view"));
+        }
+
+        const scoreViewElement = popularVideoDetect.tools.getScoreElement(popularityScore);
+
+        info.meta.appendChild(scoreViewElement);
+
+        // Video öğesinin işlendiğini belirten bir işaret ekleyin
+        videoElement.setAttribute('data-processed', 'true');
+      }
+    });
+  },
+  debounce: (func, wait) => {
+    let timeout;
+    return function (...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
   },
   ready: () => {
-    const observer = new MutationObserver(popularVideoDetect.init);
+    const observer = new MutationObserver(
+      popularVideoDetect.debounce(popularVideoDetect.init, 500)
+    );
+
     observer.observe(document.body, { childList: true, subtree: true });
   },
 };

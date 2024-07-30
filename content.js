@@ -97,9 +97,9 @@ const popularVideoDetect = {
     },
     getScoreElement: (score) => {
       const scoreView = document.createElement("span");
-      scoreView.textContent = `Score: ${score}`;
       scoreView.classList.add("score-view");
       scoreView.style.width = "100%";
+      scoreView.innerHTML = `<span style="background-color: #ff0100; padding: 3px 5px; border-radius: 5px; font-size: 11px; font-weight: 600; color: white; ">Score: ${score}</span>`;
 
       return scoreView;
     },
@@ -130,15 +130,14 @@ const popularVideoDetect = {
   },
   init: () => {
     if (!popularVideoDetect.tools.isYoutubeHomePage()) return;
-    console.log("init!");
 
     const videoElements = document.querySelectorAll("ytd-rich-item-renderer");
 
     videoElements.forEach((videoElement) => {
-      // Video öğesinin daha önce işlendiğini kontrol edin
-      if (videoElement.getAttribute('data-processed')) return;
+      if (videoElement.getAttribute("data-processed")) return;
 
-      const hasElement = popularVideoDetect.tools.isNotEmptyElement(videoElement);
+      const hasElement =
+        popularVideoDetect.tools.isNotEmptyElement(videoElement);
 
       if (hasElement) {
         const info = popularVideoDetect.getVideoInfo(videoElement);
@@ -147,21 +146,24 @@ const popularVideoDetect = {
           console.log("info: ", info);
         }
 
-        const popularityScore = popularVideoDetect.tools.calculatePopularityScore(
-          info.uploadDate.date,
-          info.viewCount
-        );
+        const popularityScore =
+          popularVideoDetect.tools.calculatePopularityScore(
+            info.uploadDate.date,
+            info.viewCount
+          );
 
         if (info.meta.querySelector(".score-view")) {
           info.meta.removeChild(info.meta.querySelector(".score-view"));
         }
 
-        const scoreViewElement = popularVideoDetect.tools.getScoreElement(popularityScore);
+        const scoreViewElement =
+          popularVideoDetect.tools.getScoreElement(popularityScore);
 
-        info.meta.appendChild(scoreViewElement);
+        if (popularityScore > 0) {
+          info.meta.appendChild(scoreViewElement);
+        }
 
-        // Video öğesinin işlendiğini belirten bir işaret ekleyin
-        videoElement.setAttribute('data-processed', 'true');
+        videoElement.setAttribute("data-processed", "true");
       }
     });
   },

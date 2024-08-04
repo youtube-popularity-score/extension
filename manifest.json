@@ -1,7 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "YouTube Title Highlighter",
-  "version": "1.0",
+  "name": "Youtube Popularity Score",
+  "description": "A plugin that rates the popularity of YouTube videos.",
+  "version": "0.0.1",
   "permissions": ["activeTab", "scripting"],
   "background": {
     "service_worker": "background.js"

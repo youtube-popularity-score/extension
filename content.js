@@ -1,20 +1,78 @@
+const languageMap = {
+  en: {
+    minute: "minute",
+    hour: "hour",
+    day: "day",
+    week: "week",
+    month: "month",
+    year: "year",
+    views: "views",
+    thousand: "K", // İngilizce için bin
+    million: "M", // İngilizce için milyon
+  },
+  tr: {
+    minute: "dakika",
+    hour: "saat",
+    day: "gün",
+    week: "hafta",
+    month: "ay",
+    year: "yıl",
+    views: "görüntüleme",
+    thousand: "B", // Türkçe için bin
+    million: "Mn", // Türkçe için milyon
+  },
+};
+
+// Seçili dili belirleme (varsayılan olarak İngilizce)
+const userLang = navigator.language || navigator.userLanguage;
+const selectedLang = userLang.startsWith("tr") ? "tr" : "en";
+
 const popularVideoDetect = {
   tools: {
     convertViewCount: (viewStr) => {
-      const viewStrCleaned = viewStr.replace(/\u00A0/g, " ");
-      const parts = viewStrCleaned.split(" ");
+      console.log("viewStr: ", viewStr);
 
-      const numberPart = parts[0].replace(/,/g, ".");
-      const suffix = parts[1];
+      // Birimlerin dil seçimine göre tanımlanması
+      const units = languageMap[selectedLang];
 
+      // Türkçe ve İngilizce için regex desenleri
+      const regexPattern =
+        selectedLang === "tr"
+          ? /(\d+([.,]\d+)?)\s*([Bb]|[Mm][nN])\s*(görüntüleme)?/ // Türkçe için güncellenmiş
+          : /(\d+([.,]\d+)?)\s*([Kk]|[Mm])\s*(views)?/; // İngilizce için
+
+      // Stringi temizleme ve uygun birimleri ayırma
+      const viewStrCleaned = viewStr
+        .replace(/\s*views?$/, "")
+        .replace(/\s*görüntüleme$/, "")
+        .trim();
+      const parts = viewStrCleaned.match(regexPattern);
+
+      if (!parts) {
+        // Geçerli bir değer değilse hata mesajı döndürelim
+        console.error("Invalid view string format.");
+        return null;
+      }
+
+      // Sayıyı ve birimi ayırma
+      const numberPart = parts[1].replace(/,/g, "."); // Türkçe formatında virgül kullanımı
+      const suffix = parts[3].toUpperCase(); // Birimi büyük harfe çevirme
+
+      // `suffix` değerine göre doğru çarpanı kullanma
       let numericValue;
-      if (suffix === "Mn") {
+      if (suffix === units.million.toUpperCase() || suffix === "M") {
         numericValue = parseFloat(numberPart) * 1_000_000;
-      } else if (suffix === "B") {
+      } else if (
+        suffix === units.thousand.toUpperCase() ||
+        suffix === "K" ||
+        suffix === "B"
+      ) {
         numericValue = parseFloat(numberPart) * 1_000;
       } else {
         numericValue = parseFloat(numberPart);
       }
+
+      console.log("numericValue: ", numericValue);
 
       return numericValue;
     },
@@ -22,34 +80,54 @@ const popularVideoDetect = {
       const now = new Date();
       let number, unit;
 
-      const match = dateStr.match(/(\d+)\s+(dakika|saat|gün|hafta|ay|yıl)/);
+      // Dil seçimine göre doğru units değerlerini alalım
+      const units = languageMap[selectedLang];
+
+      // Regex pattern'ini güncelleyelim
+      const regexPattern = new RegExp(
+        `(\\d+)\\s+(${units.minute}s?|${units.hour}s?|${units.day}s?|${units.week}s?|${units.month}s?|${units.year}s?)\\s+ago`,
+        "i" // Case insensitive for English
+      );
+
+      const match = dateStr.match(regexPattern);
+
       if (match) {
         number = parseInt(match[1], 10);
-        unit = match[2];
+        unit = match[2].toLowerCase(); // Case insensitive matching
       } else {
+        console.log("No match found for:", dateStr); // Debugging line to check if regex matches
         return null;
       }
 
       let pastDate = new Date(now);
       switch (unit) {
-        case "dakika":
+        case units.minute:
+        case units.minute + "s": // Minutes
           pastDate.setMinutes(now.getMinutes() - number);
           break;
-        case "saat":
+        case units.hour:
+        case units.hour + "s": // Hours
           pastDate.setHours(now.getHours() - number);
           break;
-        case "gün":
+        case units.day:
+        case units.day + "s": // Days
           pastDate.setDate(now.getDate() - number);
           break;
-        case "hafta":
+        case units.week:
+        case units.week + "s": // Weeks
           pastDate.setDate(now.getDate() - number * 7);
           break;
-        case "ay":
+        case units.month:
+        case units.month + "s": // Months
           pastDate.setMonth(now.getMonth() - number);
           break;
-        case "yıl":
+        case units.year:
+        case units.year + "s": // Years
           pastDate.setFullYear(now.getFullYear() - number);
           break;
+        default:
+          console.log("Unknown unit:", unit); // Debugging line to check if unit is recognized
+          return null;
       }
 
       const diffTime = Math.abs(now - pastDate);

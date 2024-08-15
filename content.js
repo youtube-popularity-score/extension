@@ -38,7 +38,7 @@ const popularVideoDetect = {
       // Türkçe ve İngilizce için regex desenleri
       const regexPattern =
         selectedLang === "tr"
-          ? /(\d+([.,]\d+)?)\s*([Bb]|[Mm][nN])\s*(görüntüleme)?/ // Türkçe için güncellenmiş
+          ? /(\d+([.,]\d+)?)\s*([Bb]|Mn)\s*(görüntüleme)?/ // Türkçe için
           : /(\d+([.,]\d+)?)\s*([Kk]|[Mm])\s*(views)?/; // İngilizce için
 
       // Stringi temizleme ve uygun birimleri ayırma
@@ -49,7 +49,6 @@ const popularVideoDetect = {
       const parts = viewStrCleaned.match(regexPattern);
 
       if (!parts) {
-        // Geçerli bir değer değilse hata mesajı döndürelim
         console.error("Invalid view string format.");
         return null;
       }
@@ -85,7 +84,7 @@ const popularVideoDetect = {
 
       // Regex pattern'ini güncelleyelim
       const regexPattern = new RegExp(
-        `(\\d+)\\s+(${units.minute}s?|${units.hour}s?|${units.day}s?|${units.week}s?|${units.month}s?|${units.year}s?)\\s+ago`,
+        `(\\d+)\\s*(${units.minute}s?|${units.hour}s?|${units.day}s?|${units.week}s?|${units.month}s?|${units.year}s?)`,
         "i" // Case insensitive for English
       );
 
@@ -95,38 +94,38 @@ const popularVideoDetect = {
         number = parseInt(match[1], 10);
         unit = match[2].toLowerCase(); // Case insensitive matching
       } else {
-        console.log("No match found for:", dateStr); // Debugging line to check if regex matches
+        console.log("No match found for:", dateStr);
         return null;
       }
 
       let pastDate = new Date(now);
       switch (unit) {
         case units.minute:
-        case units.minute + "s": // Minutes
+        case units.minute + "s": // Dakikalar
           pastDate.setMinutes(now.getMinutes() - number);
           break;
         case units.hour:
-        case units.hour + "s": // Hours
+        case units.hour + "s": // Saatler
           pastDate.setHours(now.getHours() - number);
           break;
         case units.day:
-        case units.day + "s": // Days
+        case units.day + "s": // Günler
           pastDate.setDate(now.getDate() - number);
           break;
         case units.week:
-        case units.week + "s": // Weeks
+        case units.week + "s": // Haftalar
           pastDate.setDate(now.getDate() - number * 7);
           break;
         case units.month:
-        case units.month + "s": // Months
+        case units.month + "s": // Aylar
           pastDate.setMonth(now.getMonth() - number);
           break;
         case units.year:
-        case units.year + "s": // Years
+        case units.year + "s": // Yıllar
           pastDate.setFullYear(now.getFullYear() - number);
           break;
         default:
-          console.log("Unknown unit:", unit); // Debugging line to check if unit is recognized
+          console.log("Unknown unit:", unit);
           return null;
       }
 
@@ -260,8 +259,13 @@ const popularVideoDetect = {
     const observer = new MutationObserver(
       popularVideoDetect.debounce(popularVideoDetect.init, 500)
     );
+    observer.observe(document, {
+      attributes: false,
+      childList: true,
+      subtree: true,
+    });
 
-    observer.observe(document.body, { childList: true, subtree: true });
+    popularVideoDetect.init();
   },
 };
 

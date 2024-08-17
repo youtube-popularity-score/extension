@@ -30,8 +30,6 @@ const selectedLang = userLang.startsWith("tr") ? "tr" : "en";
 const popularVideoDetect = {
   tools: {
     convertViewCount: (viewStr) => {
-      console.log("viewStr: ", viewStr);
-
       // Birimlerin dil seçimine göre tanımlanması
       const units = languageMap[selectedLang];
 
@@ -71,8 +69,6 @@ const popularVideoDetect = {
         numericValue = parseFloat(numberPart);
       }
 
-      console.log("numericValue: ", numericValue);
-
       return numericValue;
     },
     convertUploadDate: (dateStr) => {
@@ -82,9 +78,14 @@ const popularVideoDetect = {
       // Dil seçimine göre doğru units değerlerini alalım
       const units = languageMap[selectedLang];
 
+      if (!units) {
+        console.log("Unsupported language:", selectedLang);
+        return null;
+      }
+
       // Regex pattern'ini güncelleyelim
       const regexPattern = new RegExp(
-        `(\\d+)\\s*(${units.minute}s?|${units.hour}s?|${units.day}s?|${units.week}s?|${units.month}s?|${units.year}s?)`,
+        `(\\d+)\\s*(${units.minute}s*|${units.hour}s*|${units.day}s*|${units.week}s*|${units.month}s*|${units.year}s*)`,
         "i" // Case insensitive for English
       );
 
@@ -101,27 +102,27 @@ const popularVideoDetect = {
       let pastDate = new Date(now);
       switch (unit) {
         case units.minute:
-        case units.minute + "s": // Dakikalar
+        case units.minute + "s": // Dakikalar / Minutes
           pastDate.setMinutes(now.getMinutes() - number);
           break;
         case units.hour:
-        case units.hour + "s": // Saatler
+        case units.hour + "s": // Saatler / Hours
           pastDate.setHours(now.getHours() - number);
           break;
         case units.day:
-        case units.day + "s": // Günler
+        case units.day + "s": // Günler / Days
           pastDate.setDate(now.getDate() - number);
           break;
         case units.week:
-        case units.week + "s": // Haftalar
+        case units.week + "s": // Haftalar / Weeks
           pastDate.setDate(now.getDate() - number * 7);
           break;
         case units.month:
-        case units.month + "s": // Aylar
+        case units.month + "s": // Aylar / Months
           pastDate.setMonth(now.getMonth() - number);
           break;
         case units.year:
-        case units.year + "s": // Yıllar
+        case units.year + "s": // Yıllar / Years
           pastDate.setFullYear(now.getFullYear() - number);
           break;
         default:

@@ -1,6 +1,32 @@
 const popularVideoDetect = {
   tools: {
+    convertViewTextFormat: (text) => {
+      const isEnglish = navigator.language === "en-GB";
+      let response = text;
+
+      if (isEnglish) {
+        const splitted = text.split(" ");
+        const countAndUnit = splitted[0];
+        const unitRegex = /[KM]/;
+        const hasUnit = unitRegex.test(countAndUnit);
+
+        if (hasUnit) {
+          const justUnit = countAndUnit.slice(
+            countAndUnit.length - 1,
+            countAndUnit.length
+          );
+          const justCount = countAndUnit.replace(justUnit, "");
+          const newText = `${justCount} ${justUnit} views`;
+
+          response = newText;
+        }
+      }
+
+      return response;
+    },
     convertViewCount: (viewStr) => {
+      viewStr = popularVideoDetect.tools.convertViewTextFormat(viewStr);
+
       const viewStrCleaned = viewStr.replace(/\u00A0/g, " ");
       const parts = viewStrCleaned.split(" ");
 
@@ -8,9 +34,11 @@ const popularVideoDetect = {
       const suffix = parts[1];
 
       let numericValue;
-      if (suffix === "Mn") {
+      if (suffix === "Mn" || suffix === "M") {
+        // İngilizce için "M" eklendi
         numericValue = parseFloat(numberPart) * 1_000_000;
-      } else if (suffix === "B") {
+      } else if (suffix === "B" || suffix === "K") {
+        // İngilizce için "K" eklendi
         numericValue = parseFloat(numberPart) * 1_000;
       } else {
         numericValue = parseFloat(numberPart);
@@ -22,7 +50,10 @@ const popularVideoDetect = {
       const now = new Date();
       let number, unit;
 
-      const match = dateStr.match(/(\d+)\s+(dakika|saat|gün|hafta|ay|yıl)/);
+      // Türkçe ve İngilizce dil seçenekleri için eşleşmeler
+      const match = dateStr.match(
+        /(\d+)\s+(dakika|saat|gün|hafta|ay|yıl|min|hour|day|week|month|year)/
+      );
       if (match) {
         number = parseInt(match[1], 10);
         unit = match[2];
@@ -33,21 +64,27 @@ const popularVideoDetect = {
       let pastDate = new Date(now);
       switch (unit) {
         case "dakika":
+        case "min":
           pastDate.setMinutes(now.getMinutes() - number);
           break;
         case "saat":
+        case "hour":
           pastDate.setHours(now.getHours() - number);
           break;
         case "gün":
+        case "day":
           pastDate.setDate(now.getDate() - number);
           break;
         case "hafta":
+        case "week":
           pastDate.setDate(now.getDate() - number * 7);
           break;
         case "ay":
+        case "month":
           pastDate.setMonth(now.getMonth() - number);
           break;
         case "yıl":
+        case "year":
           pastDate.setFullYear(now.getFullYear() - number);
           break;
       }

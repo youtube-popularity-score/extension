@@ -102,12 +102,16 @@ const popularVideoDetect = {
       const uploadDateObject = new Date(uploadDate);
 
       const diffTime = Math.abs(now - uploadDateObject);
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      const diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
 
       const viewsPerDay = viewCount / diffDays;
 
-      const maxViewsPerDay = 1_000_000;
-      const score = Math.min((viewsPerDay / maxViewsPerDay) * 10, 10);
+      // Logaritmik hesaplama
+      const logViewsPerDay = Math.log10(viewsPerDay);
+
+      // 10 milyon görüntülenmeyi maksimum referans olarak kullanmak
+      const maxLogViewsPerDay = Math.log10(10_000_000);
+      const score = Math.min((logViewsPerDay / maxLogViewsPerDay) * 10, 10);
 
       return Math.floor(score);
     },
@@ -136,7 +140,19 @@ const popularVideoDetect = {
       const scoreView = document.createElement("span");
       scoreView.classList.add("score-view");
       scoreView.style.width = "100%";
-      scoreView.innerHTML = `<span style="background-color: #ff0100; padding: 3px 5px; border-radius: 5px; font-size: 11px; font-weight: 600; color: white; ">Score: ${score}</span>`;
+
+      let backgroundColor;
+      if (score <= 5) {
+        backgroundColor = "#FF0000";
+      } else if (score <= 7) {
+        backgroundColor = "#D26113";
+      } else if (score <= 9) {
+        backgroundColor = "#11900c";
+      } else if (score === 10) {
+        backgroundColor = "#BCAE04";
+      }
+
+      scoreView.innerHTML = `<span style="background-color: ${backgroundColor}; padding: 3px 5px; border-radius: 5px; font-size: 11px; font-weight: 600; color: white;">Score: ${score}</span>`;
 
       return scoreView;
     },

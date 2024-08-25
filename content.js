@@ -35,10 +35,19 @@ const popularVideoDetect = {
 
       let numericValue;
       if (suffix === "Mn" || suffix === "M") {
-        // İngilizce için "M" eklendi
         numericValue = parseFloat(numberPart) * 1_000_000;
-      } else if (suffix === "B" || suffix === "K") {
-        // İngilizce için "K" eklendi
+      } else if (suffix === "B") {
+        if (navigator.language === "tr-TR") {
+          // Türkçe dilinde "B" bin olarak kabul edilir.
+          numericValue = parseFloat(numberPart) * 1_000;
+        } else {
+          // İngilizce dilinde "B" milyar olarak kabul edilir.
+          numericValue = parseFloat(numberPart) * 1_000_000_000;
+        }
+      } else if (suffix === "Mr") {
+        // Türkçe dilinde milyar için "Mr" kullanılır.
+        numericValue = parseFloat(numberPart) * 1_000_000_000;
+      } else if (suffix === "K") {
         numericValue = parseFloat(numberPart) * 1_000;
       } else {
         numericValue = parseFloat(numberPart);
@@ -50,7 +59,6 @@ const popularVideoDetect = {
       const now = new Date();
       let number, unit;
 
-      // Türkçe ve İngilizce dil seçenekleri için eşleşmeler
       const match = dateStr.match(
         /(\d+)\s+(dakika|saat|gün|hafta|ay|yıl|min|hour|day|week|month|year)/
       );
@@ -106,10 +114,8 @@ const popularVideoDetect = {
 
       const viewsPerDay = viewCount / diffDays;
 
-      // Logaritmik hesaplama
       const logViewsPerDay = Math.log10(viewsPerDay);
 
-      // 10 milyon görüntülenmeyi maksimum referans olarak kullanmak
       const maxLogViewsPerDay = Math.log10(10_000_000);
       const score = Math.min((logViewsPerDay / maxLogViewsPerDay) * 10, 10);
 
@@ -145,7 +151,7 @@ const popularVideoDetect = {
       if (score <= 5) {
         backgroundColor = "#FF0000";
       } else if (score <= 7) {
-        backgroundColor = "#D26113";
+        backgroundColor = "#72db6e";
       } else if (score <= 9) {
         backgroundColor = "#11900c";
       } else if (score === 10) {

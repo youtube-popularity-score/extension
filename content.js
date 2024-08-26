@@ -148,17 +148,36 @@ const popularVideoDetect = {
       scoreView.style.width = "100%";
 
       let backgroundColor;
-      if (score <= 5) {
-        backgroundColor = "#FF0000";
-      } else if (score <= 7) {
-        backgroundColor = "#72db6e";
-      } else if (score <= 9) {
-        backgroundColor = "#11900c";
-      } else if (score === 10) {
-        backgroundColor = "#BCAE04";
+
+      if (score >= 1 && score <= 2) {
+        backgroundColor = "#ff3c41"; // Kırmızı
+      } else if (score >= 3 && score <= 4) {
+        backgroundColor = "#FFA500"; // Turuncu
+      } else if (score >= 5 && score <= 6) {
+        backgroundColor = "#fcd000"; // Sarı
+      } else if (score >= 7 && score <= 8) {
+        backgroundColor = "#ADFF2F"; // Açık Yeşil
+      } else if (score >= 9 && score <= 10) {
+        backgroundColor = "#47cf73"; // Yeşil
+      } else {
+        backgroundColor = "#CCCCCC"; // Geçersiz puanlar için nötr bir renk
       }
 
-      scoreView.innerHTML = `<span style="background-color: ${backgroundColor}; padding: 3px 5px; border-radius: 5px; font-size: 11px; font-weight: 600; color: white;">Score: ${score}</span>`;
+      scoreView.innerHTML = `
+    <span 
+      style="
+        background-color: ${backgroundColor}; 
+        padding: 3px 5px; 
+        border-radius: 5px; 
+        font-size: 1rem; 
+        font-weight: 400;
+        color: black;
+        font-family: Roboto, Arial, sans-serif;
+      "
+    >
+      Score: ${score}
+    </span>
+  `;
 
       return scoreView;
     },

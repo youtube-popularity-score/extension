@@ -150,15 +150,15 @@ const popularVideoDetect = {
       let backgroundColor;
 
       if (score >= 1 && score <= 2) {
-        backgroundColor = "#ff3c41"; // Kırmızı
+        backgroundColor = "#f94040"; // Kırmızı
       } else if (score >= 3 && score <= 4) {
         backgroundColor = "#FFA500"; // Turuncu
       } else if (score >= 5 && score <= 6) {
         backgroundColor = "#fcd000"; // Sarı
       } else if (score >= 7 && score <= 8) {
-        backgroundColor = "#ADFF2F"; // Açık Yeşil
+        backgroundColor = "#52cf80"; // Açık Yeşil
       } else if (score >= 9 && score <= 10) {
-        backgroundColor = "#47cf73"; // Yeşil
+        backgroundColor = "#4cbb70"; // Yeşil
       } else {
         backgroundColor = "#CCCCCC"; // Geçersiz puanlar için nötr bir renk
       }
@@ -171,7 +171,7 @@ const popularVideoDetect = {
         border-radius: 5px; 
         font-size: 1rem; 
         font-weight: 400;
-        color: black;
+        color: #313131;
         font-family: Roboto, Arial, sans-serif;
       "
     >

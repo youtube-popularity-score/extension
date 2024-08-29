@@ -146,38 +146,49 @@ const popularVideoDetect = {
       const scoreView = document.createElement("span");
       scoreView.classList.add("score-view");
       scoreView.style.width = "100%";
+      scoreView.style.display = "flex";
+      scoreView.style.alignItems = "center";
 
       let backgroundColor;
+      let textColor;
 
       if (score >= 1 && score <= 2) {
         backgroundColor = "#f94040"; // Kırmızı
+        textColor = "#fff"; // beyaz
       } else if (score >= 3 && score <= 4) {
         backgroundColor = "#FFA500"; // Turuncu
+        textColor = "#483005"; // siyah
       } else if (score >= 5 && score <= 6) {
         backgroundColor = "#fcd000"; // Sarı
+        textColor = "#544915"; // siyah
       } else if (score >= 7 && score <= 8) {
         backgroundColor = "#52cf80"; // Açık Yeşil
+        textColor = "#0f311c"; // beyaz
       } else if (score >= 9 && score <= 10) {
         backgroundColor = "#4cbb70"; // Yeşil
+        textColor = "#fff"; // beyaz
       } else {
         backgroundColor = "#CCCCCC"; // Geçersiz puanlar için nötr bir renk
+        textColor = "#fff"; // beyaz
       }
 
       scoreView.innerHTML = `
-    <span 
-      style="
-        background-color: ${backgroundColor}; 
-        padding: 3px 5px; 
-        border-radius: 5px; 
-        font-size: 1rem; 
-        font-weight: 400;
-        color: #313131;
-        font-family: Roboto, Arial, sans-serif;
-      "
-    >
-      Score: ${score}
-    </span>
-  `;
+      <svg style="position: relative;" xmlns="http://www.w3.org/2000/svg" width="16" height="16"><defs><linearGradient id="a" x1=".5" x2=".5" y2="1" gradientUnits="objectBoundingBox"><stop offset="0" stop-color="#e83323"/><stop offset="1" stop-color="#741a12"/></linearGradient></defs><g data-name="Group 5" transform="translate(-2529 5257)"><circle data-name="Ellipse 13" cx="5.333" cy="5.333" r="5.333" transform="translate(2531.667 -5254.333)" fill="#fff"/><g data-name="Group 4" transform="translate(2529 -5257)" fill="url(#a)"><path data-name="Path 768" d="M8 0a8 8 0 1 0 8 8 8 8 0 0 0-8-8m0 13.333A5.333 5.333 0 1 1 13.333 8 5.333 5.333 0 0 1 8 13.333"/><path data-name="Path 769" d="M8 5.333a2.665 2.665 0 0 0-.787.118 1.333 1.333 0 1 1-1.762 1.762A2.667 2.667 0 1 0 8 5.333"/></g></g></svg>
+      <span 
+        style="
+          background-color: ${backgroundColor}; 
+          padding: 0px 6px;
+          border-radius: 0px 5px 5px 0px;
+          font-size: 1rem;
+          font-weight: 600;
+          color: ${textColor}; 
+          font-family: Roboto, Arial, sans-serif;
+          height: 12px;
+          line-height: 13px;
+          margin-left: -3px;
+        "
+      >${score}</span>
+    `;
 
       return scoreView;
     },

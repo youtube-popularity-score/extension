@@ -25,6 +25,10 @@ const popularVideoDetect = {
       return response;
     },
     convertViewCount: (viewStr) => {
+      const language =
+        document.documentElement.lang ||
+        document.querySelector("html").getAttribute("lang");
+
       viewStr = popularVideoDetect.tools.convertViewTextFormat(viewStr);
 
       const viewStrCleaned = viewStr.replace(/\u00A0/g, " ");
@@ -37,11 +41,11 @@ const popularVideoDetect = {
       if (suffix === "Mn" || suffix === "M") {
         numericValue = parseFloat(numberPart) * 1_000_000;
       } else if (suffix === "B") {
-        if (navigator.language === "tr-TR") {
+        if (language === "tr-TR" || language === "tr") {
           // Türkçe dilinde "B" bin olarak kabul edilir.
           numericValue = parseFloat(numberPart) * 1_000;
         } else {
-          // İngilizce dilinde "B" milyar olarak kabul edilir.
+          // Diğer dillerde "B" milyar olarak kabul edilir.
           numericValue = parseFloat(numberPart) * 1_000_000_000;
         }
       } else if (suffix === "Mr") {

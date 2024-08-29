@@ -1,0 +1,9 @@
+"build/**"
+"node_modules/**"
+"zip/**"
+package.json
+package-lock.json
+.gitignore
+copy-with-ignore.js
+update-version.js
+zip-build.js

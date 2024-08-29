@@ -1,12 +1,16 @@
 {
   "scripts": {
     "version:increment": "node update-version.js",
-    "copy": "copyfiles -e build \"*.*\" \"build/\"",
+    "copy": "node copy-with-ignore.js",
     "minify": "terser build/content.js -c -m -o build/content.js",
-    "build": "npm run version:increment && npm run copy && npm run minify"
+    "zip": "node zip-build.js",
+    "build": "npm run version:increment && npm run copy && npm run minify && npm run zip"
   },
   "devDependencies": {
     "copyfiles": "^2.4.1",
     "terser": "^5.31.6"
+  },
+  "dependencies": {
+    "archiver": "^7.0.1"
   }
 }

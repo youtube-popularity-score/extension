@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Youtube Popularity Score",
   "description": "A plugin that rates the popularity of YouTube videos.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "background": {
     "service_worker": "background.js"
   },

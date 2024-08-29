@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "version:increment": "node update-version.js",
+    "copy": "copyfiles -e build \"*.*\" \"build/\"",
+    "minify": "terser build/content.js -c -m -o build/content.js",
+    "build": "npm run version:increment && npm run copy && npm run minify"
+  },
+  "devDependencies": {
+    "copyfiles": "^2.4.1",
+    "terser": "^5.31.6"
+  }
+}

@@ -227,17 +227,13 @@ const popularVideoDetect = {
     const videoElements = document.querySelectorAll("ytd-rich-item-renderer");
 
     videoElements.forEach((videoElement) => {
-      if (videoElement.getAttribute("data-processed")) return;
+      if (videoElement.getAttribute("data-processed") || !videoElement) return;
 
       const hasElement =
         popularVideoDetect.tools.isNotEmptyElement(videoElement);
 
       if (hasElement) {
         const info = popularVideoDetect.getVideoInfo(videoElement);
-
-        if (!info.uploadDate?.date) {
-          console.log("info: ", info);
-        }
 
         const popularityScore =
           popularVideoDetect.tools.calculatePopularityScore(

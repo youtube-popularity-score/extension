@@ -1,11 +1,11 @@
 const popularVideoDetect = {
   tools: {
     convertViewTextFormat: (text) => {
-      const isEnglish = navigator.language === "en-GB";
+      const isEnglish = navigator.language === 'en-GB';
       let response = text;
 
       if (isEnglish) {
-        const splitted = text.split(" ");
+        const splitted = text.split(' ');
         const countAndUnit = splitted[0];
         const unitRegex = /[KM]/;
         const hasUnit = unitRegex.test(countAndUnit);
@@ -15,7 +15,7 @@ const popularVideoDetect = {
             countAndUnit.length - 1,
             countAndUnit.length
           );
-          const justCount = countAndUnit.replace(justUnit, "");
+          const justCount = countAndUnit.replace(justUnit, '');
           const newText = `${justCount} ${justUnit} views`;
 
           response = newText;
@@ -27,31 +27,39 @@ const popularVideoDetect = {
     convertViewCount: (viewStr) => {
       const language =
         document.documentElement.lang ||
-        document.querySelector("html").getAttribute("lang");
+        document.querySelector('html').getAttribute('lang');
 
       viewStr = popularVideoDetect.tools.convertViewTextFormat(viewStr);
 
-      const viewStrCleaned = viewStr.replace(/\u00A0/g, " ");
-      const parts = viewStrCleaned.split(" ");
+      const viewStrCleaned = viewStr.replace(/\u00A0/g, ' ');
+      const parts = viewStrCleaned.split(' ');
 
-      const numberPart = parts[0].replace(/,/g, ".");
-      const suffix = parts[1];
+      let numberPart;
+      let suffix;
+
+      if (language === 'tr-TR' || language === 'tr') {
+        numberPart = parts[0].replace(/,/g, '.');
+        suffix = parts[1];
+      } else {
+        numberPart = parts[0].slice(0, parts[0].length - 1).replace(/,/g, '.');
+        suffix = parts[0].slice(parts[0].length - 1, parts[0].length);
+      }
 
       let numericValue;
-      if (suffix === "Mn" || suffix === "M") {
+      if (suffix === 'Mn' || suffix === 'M') {
         numericValue = parseFloat(numberPart) * 1_000_000;
-      } else if (suffix === "B") {
-        if (language === "tr-TR" || language === "tr") {
+      } else if (suffix === 'B') {
+        if (language === 'tr-TR' || language === 'tr') {
           // Türkçe dilinde "B" bin olarak kabul edilir.
           numericValue = parseFloat(numberPart) * 1_000;
         } else {
           // Diğer dillerde "B" milyar olarak kabul edilir.
           numericValue = parseFloat(numberPart) * 1_000_000_000;
         }
-      } else if (suffix === "Mr") {
+      } else if (suffix === 'Mr') {
         // Türkçe dilinde milyar için "Mr" kullanılır.
         numericValue = parseFloat(numberPart) * 1_000_000_000;
-      } else if (suffix === "K") {
+      } else if (suffix === 'K') {
         numericValue = parseFloat(numberPart) * 1_000;
       } else {
         numericValue = parseFloat(numberPart);
@@ -75,28 +83,28 @@ const popularVideoDetect = {
 
       let pastDate = new Date(now);
       switch (unit) {
-        case "dakika":
-        case "min":
+        case 'dakika':
+        case 'min':
           pastDate.setMinutes(now.getMinutes() - number);
           break;
-        case "saat":
-        case "hour":
+        case 'saat':
+        case 'hour':
           pastDate.setHours(now.getHours() - number);
           break;
-        case "gün":
-        case "day":
+        case 'gün':
+        case 'day':
           pastDate.setDate(now.getDate() - number);
           break;
-        case "hafta":
-        case "week":
+        case 'hafta':
+        case 'week':
           pastDate.setDate(now.getDate() - number * 7);
           break;
-        case "ay":
-        case "month":
+        case 'ay':
+        case 'month':
           pastDate.setMonth(now.getMonth() - number);
           break;
-        case "yıl":
-        case "year":
+        case 'yıl':
+        case 'year':
           pastDate.setFullYear(now.getFullYear() - number);
           break;
       }
@@ -126,13 +134,18 @@ const popularVideoDetect = {
       return Math.floor(score);
     },
     isNotEmptyElement: (videoElement) => {
-      const isReels = videoElement.getAttribute("is-slim-media") !== null;
-      const meta = videoElement.querySelector("#metadata-line");
+      const isReels = videoElement.getAttribute('is-slim-media') !== null;
 
-      const viewCount = meta.querySelector("span:nth-of-type(1)");
+      if (isReels) return false;
+
+      const meta = videoElement.querySelector('#metadata-line');
+
+      if (!meta) return false;
+
+      const viewCount = meta.querySelector('span:nth-of-type(1)');
       const viewCountText = viewCount?.innerText;
 
-      const uploadDate = meta.querySelector("span:nth-of-type(2)");
+      const uploadDate = meta.querySelector('span:nth-of-type(2)');
       const uploadDateText = uploadDate?.innerText;
 
       return (
@@ -140,40 +153,40 @@ const popularVideoDetect = {
         meta &&
         viewCount &&
         viewCountText &&
-        viewCountText !== "" &&
+        viewCountText !== '' &&
         uploadDate &&
         uploadDateText &&
-        uploadDateText !== ""
+        uploadDateText !== ''
       );
     },
     getScoreElement: (score) => {
-      const scoreView = document.createElement("span");
-      scoreView.classList.add("score-view");
-      scoreView.style.width = "100%";
-      scoreView.style.display = "flex";
-      scoreView.style.alignItems = "center";
+      const scoreView = document.createElement('span');
+      scoreView.classList.add('score-view');
+      scoreView.style.width = '100%';
+      scoreView.style.display = 'flex';
+      scoreView.style.alignItems = 'center';
 
       let backgroundColor;
       let textColor;
 
       if (score >= 1 && score <= 2) {
-        backgroundColor = "#f94040"; // Kırmızı
-        textColor = "#fff"; // beyaz
+        backgroundColor = '#f94040'; // Kırmızı
+        textColor = '#fff'; // beyaz
       } else if (score >= 3 && score <= 4) {
-        backgroundColor = "#FFA500"; // Turuncu
-        textColor = "#483005"; // siyah
+        backgroundColor = '#FFA500'; // Turuncu
+        textColor = '#483005'; // siyah
       } else if (score >= 5 && score <= 6) {
-        backgroundColor = "#fcd000"; // Sarı
-        textColor = "#544915"; // siyah
+        backgroundColor = '#fcd000'; // Sarı
+        textColor = '#544915'; // siyah
       } else if (score >= 7 && score <= 8) {
-        backgroundColor = "#52cf80"; // Açık Yeşil
-        textColor = "#0f311c"; // beyaz
+        backgroundColor = '#52cf80'; // Açık Yeşil
+        textColor = '#0f311c'; // beyaz
       } else if (score >= 9 && score <= 10) {
-        backgroundColor = "#4cbb70"; // Yeşil
-        textColor = "#fff"; // beyaz
+        backgroundColor = '#4cbb70'; // Yeşil
+        textColor = '#fff'; // beyaz
       } else {
-        backgroundColor = "#CCCCCC"; // Geçersiz puanlar için nötr bir renk
-        textColor = "#fff"; // beyaz
+        backgroundColor = '#CCCCCC'; // Geçersiz puanlar için nötr bir renk
+        textColor = '#fff'; // beyaz
       }
 
       scoreView.innerHTML = `
@@ -199,18 +212,18 @@ const popularVideoDetect = {
     isYoutubeHomePage: () => {
       const url = window.location.href;
       return (
-        url === "https://www.youtube.com/" ||
-        url.startsWith("https://www.youtube.com/?")
+        url === 'https://www.youtube.com/' ||
+        url.startsWith('https://www.youtube.com/?')
       );
     },
   },
   getVideoInfo: (videoElement) => {
-    const meta = videoElement.querySelector("#metadata-line");
+    const meta = videoElement.querySelector('#metadata-line');
 
-    const viewCount = meta.querySelector("span:nth-of-type(1)");
+    const viewCount = meta.querySelector('span:nth-of-type(1)');
     const viewCountText = viewCount.innerText;
 
-    const uploadDate = meta.querySelector("span:nth-of-type(2)");
+    const uploadDate = meta.querySelector('span:nth-of-type(2)');
     const uploadDateText = uploadDate.innerText;
 
     return {
@@ -224,10 +237,10 @@ const popularVideoDetect = {
   init: () => {
     if (!popularVideoDetect.tools.isYoutubeHomePage()) return;
 
-    const videoElements = document.querySelectorAll("ytd-rich-item-renderer");
+    const videoElements = document.querySelectorAll('ytd-rich-item-renderer');
 
     videoElements.forEach((videoElement) => {
-      if (videoElement.getAttribute("data-processed") || !videoElement) return;
+      if (videoElement.getAttribute('data-processed') || !videoElement) return;
 
       const hasElement =
         popularVideoDetect.tools.isNotEmptyElement(videoElement);
@@ -241,8 +254,8 @@ const popularVideoDetect = {
             info.viewCount
           );
 
-        if (info.meta.querySelector(".score-view")) {
-          info.meta.removeChild(info.meta.querySelector(".score-view"));
+        if (info.meta.querySelector('.score-view')) {
+          info.meta.removeChild(info.meta.querySelector('.score-view'));
         }
 
         const scoreViewElement =
@@ -252,7 +265,7 @@ const popularVideoDetect = {
           info.meta.appendChild(scoreViewElement);
         }
 
-        videoElement.setAttribute("data-processed", "true");
+        videoElement.setAttribute('data-processed', 'true');
       }
     });
   },

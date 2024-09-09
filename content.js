@@ -29,8 +29,6 @@ const popularVideoDetect = {
         document.documentElement.lang ||
         document.querySelector("html").getAttribute("lang");
 
-      // viewStr = popularVideoDetect.tools.convertViewTextFormat(viewStr);
-
       viewStr = viewStr.replace(/\s+/g, " ");
 
       const parts = viewStr.split(" ");
@@ -51,14 +49,11 @@ const popularVideoDetect = {
         numericValue = parseFloat(numberPart) * 1_000_000;
       } else if (suffix === "B") {
         if (language === "tr-TR" || language === "tr") {
-          // Türkçe dilinde "B" bin olarak kabul edilir.
           numericValue = parseFloat(numberPart) * 1_000;
         } else {
-          // Diğer dillerde "B" milyar olarak kabul edilir.
           numericValue = parseFloat(numberPart) * 1_000_000_000;
         }
       } else if (suffix === "Mr") {
-        // Türkçe dilinde milyar için "Mr" kullanılır.
         numericValue = parseFloat(numberPart) * 1_000_000_000;
       } else if (suffix === "K") {
         numericValue = parseFloat(numberPart) * 1_000;

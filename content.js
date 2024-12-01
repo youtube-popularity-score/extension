@@ -122,12 +122,13 @@ const popularVideoDetect = {
 
       const viewsPerDay = viewCount / diffDays;
 
-      const logViewsPerDay = Math.log10(viewsPerDay);
+      const referenceViewsPerDay = 500_000;
 
-      const maxLogViewsPerDay = Math.log10(10_000_000);
-      const score = Math.min((logViewsPerDay / maxLogViewsPerDay) * 10, 10);
+      const rawScore = (viewsPerDay / referenceViewsPerDay) * 10;
 
-      return Math.floor(score);
+      const score = Math.min(Math.max(Math.round(rawScore), 0), 10);
+
+      return score;
     },
     isNotEmptyElement: (videoElement) => {
       const isReels = videoElement.getAttribute("is-slim-media") !== null;

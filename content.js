@@ -113,7 +113,29 @@ const popularVideoDetect = {
         daysAgo: diffDays,
       };
     },
-    calculatePopularityScore: (uploadDate, viewCount) => {
+    getMaxViewCount: () => {
+      const videoElements = document.querySelectorAll("ytd-rich-item-renderer");
+
+      let maxViews = 0;
+
+      videoElements.forEach((videoElement) => {
+        if (!popularVideoDetect.tools.isNotEmptyElement(videoElement)) return;
+
+        const meta = videoElement.querySelector("#metadata-line");
+        const viewCountText = meta.querySelector(
+          "span:nth-of-type(1)"
+        )?.innerText;
+        const viewCount =
+          popularVideoDetect.tools.convertViewCount(viewCountText) || 0;
+
+        if (viewCount > maxViews) {
+          maxViews = viewCount;
+        }
+      });
+
+      return maxViews;
+    },
+    calculatePopularityScore: (uploadDate, viewCount, maxViewsPerDay) => {
       const now = new Date();
       const uploadDateObject = new Date(uploadDate);
 
@@ -122,8 +144,7 @@ const popularVideoDetect = {
 
       const viewsPerDay = viewCount / diffDays;
 
-      const referenceViewsPerDay = 500_000;
-
+      const referenceViewsPerDay = maxViewsPerDay || 1; // maxViewsPerDay yoksa varsayılan 1
       const rawScore = (viewsPerDay / referenceViewsPerDay) * 10;
 
       const score = Math.min(Math.max(Math.round(rawScore), 0), 10);
@@ -236,6 +257,8 @@ const popularVideoDetect = {
 
     const videoElements = document.querySelectorAll("ytd-rich-item-renderer");
 
+    let maxViewsPerDay = 0;
+
     videoElements.forEach((videoElement) => {
       if (videoElement.getAttribute("data-processed") || !videoElement) return;
 
@@ -245,10 +268,24 @@ const popularVideoDetect = {
       if (hasElement) {
         const info = popularVideoDetect.getVideoInfo(videoElement);
 
+        // Günlük izlenme hızını hesapla
+        const diffTime = Math.abs(new Date() - new Date(info.uploadDate.date));
+        const diffDays = Math.max(
+          1,
+          Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+        );
+        const viewsPerDay = info.viewCount / diffDays;
+
+        // En yüksek günlük izlenme hızını güncelle
+        if (viewsPerDay > maxViewsPerDay) {
+          maxViewsPerDay = viewsPerDay;
+        }
+
         const popularityScore =
           popularVideoDetect.tools.calculatePopularityScore(
             info.uploadDate.date,
-            info.viewCount
+            info.viewCount,
+            maxViewsPerDay
           );
 
         if (info.meta.querySelector(".score-view")) {
